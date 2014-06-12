@@ -3,47 +3,75 @@ Report for Peer Assessment 1
 
 **Load Data**
 
-```{r}
+
+```r
     rawData<-read.csv("activity.csv",colClasses = c("numeric", "Date", "numeric"))
 ```
 
 **Distribution of total number of steps taken per day based on raw data**
-```{r fig.width=7, fig.height=7}
+
+```r
     sumRawData<-aggregate(steps~date,FUN=sum,data=rawData)
 
     hist(sumRawData$steps,main="",col = "red", xlab = "Total number of steps taken per day",labels=T)
 ```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+
 **Mean total number of steps taken per day based on raw data**
-```{r}
+
+```r
     mean(sumRawData$steps)
 ```
+
+```
+## [1] 10766
+```
 **Median total number of steps taken per day based on raw data**
-```{r}
+
+```r
     median(sumRawData$steps)
 ```
 
+```
+## [1] 10765
+```
+
 **Average daily activity pattern based on raw data**
-```{r fig.width=7, fig.height=6}
+
+```r
     avgRawData<-aggregate(steps~interval,FUN=mean,data=rawData)
     
     plot(avgRawData$interval,avgRawData$steps,type="l",col="red",
     xlab="Interval",ylab="Average Steps Taken")
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
+
 **Identifying time interval with maximum number of steps**
-```{r}
+
+```r
     avgRawData$interval[max(avgRawData$steps)]
+```
+
+```
+## [1] 1705
 ```
 
 
 **Total number of rows with steps=NA**
-```{r}
+
+```r
     length(rawData$steps[rawData$steps=="NA"])
 ```
 
+```
+## [1] 2304
+```
+
 **Filling in the missing values in the dataset with mean value for each 5-minute interval**
-```{r}
+
+```r
     newData<-merge(rawData,avgRawData,by="interval")
     names(newData)<-c("interval","steps","date","avgSteps")
 
@@ -52,24 +80,45 @@ Report for Peer Assessment 1
 ```
 **Distribution of total number of steps taken per day after imputing missing values**
 
-```{r fig.width=7, fig.height=7}
+
+```r
     sumNewData<-aggregate(steps~date,FUN=sum,data=newData)
     hist(sumNewData$steps,main="",col = "red", xlab = "Total number of steps taken per day",labels=T)
 ```
 
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
+
 **Mean total number of steps taken per day after imputing missing values**
-```{r}
+
+```r
     mean(sumNewData$steps)
 ```
+
+```
+## [1] 10766
+```
 **Median total number of steps taken per day after imputing missing values**
-```{r}
+
+```r
     median(sumNewData$steps)
+```
+
+```
+## [1] 10766
 ```
 ***Since missing data are filled by the mean value of the corresponding 5-minute interval, the mean value is the same as that of the raw data, and the median value is very close to that of the raw data.***
 
 **Differences in activity patterns between weekdays and weekends**
-```{r}
+
+```r
     Sys.setlocale("LC_TIME", "English")
+```
+
+```
+## [1] "English_United States.1252"
+```
+
+```r
     newData$DayofWeek<-ifelse(weekdays(newData$date) %in% c("Sunday","Saturday"),"weekend","weekday")
     newData$DayofWeek<-as.factor(newData$DayofWeek)
     avgNewData<-aggregate(steps~interval+DayofWeek,FUN=mean,data=newData)
@@ -82,3 +131,5 @@ Report for Peer Assessment 1
          avgNewData$steps[avgNewData$DayofWeek=="weekend"],type="l",col="red",
          xlab="Interval",ylab="Average Steps Taken",main="Weekend")
 ```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12.png) 
